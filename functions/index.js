@@ -12,6 +12,7 @@ const user = require("./routes/user_action");
 const mission = require("./routes/mission_action");
 const achievement = require("./routes/achievement_action");
 const journal = require("./routes/journal_action");
+const craving = require("./routes/cravigs_action");
 //
 // dotenv.config();
 const app = express();
@@ -25,5 +26,6 @@ app.use("/user", user);
 app.use("/mission", mission);
 app.use("/achievement", achievement);
 app.use("/journal", journal);
+app.use("/cravings", craving);
 
 exports.app = functions.https.onRequest(app);

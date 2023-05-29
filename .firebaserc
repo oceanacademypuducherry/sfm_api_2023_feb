@@ -1,5 +1,8 @@
 {
   "projects": {
-    "default": "quit-smoking-ffce6"
-  }
+    "default": "quit-smoking-ffce6",
+    "qc": "quit-smoking-ffce6"
+  },
+  "targets": {},
+  "etags": {}
 }

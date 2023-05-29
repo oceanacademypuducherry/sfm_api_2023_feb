@@ -63,6 +63,26 @@ route.post("/login", async (req, res) => {
   }
 });
 
+route.post("/oauth", async (req, res) => {
+  const email = req.body.email;
+  const username = req.body.username;
+
+  try {
+    const col = doc(db, "Users", email);
+
+    const userData = await getDoc(col);
+    if (userData.exists()) {
+      res.status(200).json({ ...userData.data(), isNewUser: false });
+    } else {
+      const user = { email: email, username: username };
+      await setDoc(col, user);
+      res.status(200).json({ ...user, isNewUser: true });
+    }
+  } catch (e) {
+    res.status(500).json({ msg: e, isSucces: false });
+  }
+});
+
 //get data collection
 route.post("/get/data_collection", async (req, res) => {
   const email = req.body.email;
@@ -106,6 +126,7 @@ route.post("/set/data_collection", async (req, res) => {
         ...data,
         missions: missions.missions,
         achievements: achievements.achievements,
+        isSubscribed: false,
       },
 
       { merge: true }
@@ -149,7 +170,65 @@ route.post("/set/backup", async (req, res) => {
     res.status(500).json({ msg: e, isSucces: false });
   }
 });
+route.post("/set/backup", async (req, res) => {
+  const email = req.body.email;
+  const data = req.body.data;
+  try {
+    //const col = collection(db, "Users", req.body.email);
+    const docRef = doc(db, "Users", email);
+    await setDoc(docRef, data, { merge: true });
 
+    res.json({ msg: "Backup completed", isSucces: true });
+  } catch (e) {
+    res.status(500).json({ msg: e, isSucces: false });
+  }
+});
+route.post("/make/subscribed", async (req, res) => {
+  const email = req.body.email;
+  const paymentId = req.body.paymentId;
+  try {
+    const docRef = doc(db, "Users", email);
+    const data = await getDoc(docRef);
+    console.log("------------------------");
+
+    if (data.exists()) {
+      await setDoc(
+        docRef,
+        { isSubscribed: true, paymentId: paymentId },
+        { merge: true }
+      );
+      res.status(201).json({ message: "purchase completed..." });
+    } else {
+      throw "email does not exist";
+    }
+
+    console.log("------------------------");
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ message: error });
+  }
+});
+route.post("/get/subscribed", async (req, res) => {
+  const email = req.body.email;
+  try {
+    const docRef = doc(db, "Users", email);
+    const data = await getDoc(docRef);
+    console.log("------------------------");
+
+    if (data.exists()) {
+      let isSub = data.data().isSubscribed ? true : false;
+      let paymentId = data.data().paymentId;
+      res.status(201).json({ isSubscribed: isSub, paymentId: paymentId });
+    } else {
+      throw "email does not exist";
+    }
+
+    console.log("------------------------");
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ message: error });
+  }
+});
 //check
 route.post("/check", async (req, res) => {
   const email = req.body.email;
