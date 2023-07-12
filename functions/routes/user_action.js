@@ -59,6 +59,12 @@ route.post("/login", async (req, res) => {
     const userData = await getDoc(col);
     res.status(200).json(userData.data());
   } catch (e) {
+    const msg = e;
+    console.log(msg);
+    if (msg) {
+      res.status(302).json(msg);
+    }
+
     res.status(500).json({ msg: e, isSucces: false });
   }
 });
